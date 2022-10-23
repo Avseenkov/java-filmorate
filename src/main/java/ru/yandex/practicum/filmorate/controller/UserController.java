@@ -25,13 +25,14 @@ public class UserController {
 
     @PostMapping
     public User create(@RequestBody @Valid User user) {
-        user = user.toBuilder().id(++id).build();
-        if (user.getName() == null || user.getName().isBlank()) {
-            user = user.toBuilder().name(user.getLogin()).build();
+        User userForSave;
+        userForSave = user.toBuilder().id(++id).build();
+        if (userForSave.getName() == null || userForSave.getName().isBlank()) {
+            userForSave = userForSave.toBuilder().name(userForSave.getLogin()).build();
         }
-        users.put(user.getId(), user);
-        log.info("Добавление пользователя {}", user);
-        return user;
+        users.put(userForSave.getId(), userForSave);
+        log.info("Добавление пользователя {}", userForSave);
+        return userForSave;
     }
 
     @PutMapping
@@ -40,11 +41,12 @@ public class UserController {
             log.info("Пользователь не найдет {}", user);
             throw new RuntimeException(String.format("Пользователь с id %s не найдет", user.getId()));
         }
+        User userForSave = user;
         if (user.getName().isBlank()) {
-            user = user.toBuilder().email(user.getEmail()).build();
+            userForSave = user.toBuilder().name(user.getLogin()).build();
         }
-        users.put(user.getId(), user);
-        log.info("Обновление пользователя {}", user);
+        users.put(userForSave.getId(), userForSave);
+        log.info("Обновление пользователя {}", userForSave);
         return user;
     }
 }

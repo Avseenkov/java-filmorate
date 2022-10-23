@@ -36,10 +36,10 @@ public class FilmController {
 
     @PostMapping
     public Film create(@RequestBody @Valid Film film) {
-        Film film1 = film.toBuilder().id(++id).build();
-        films.put(film1.getId(), film1);
-        log.info("Добавление фильма {}", film1);
-        return film1;
+        Film filmWithGeneratedId = film.toBuilder().id(++id).build();
+        films.put(filmWithGeneratedId.getId(), filmWithGeneratedId);
+        log.info("Добавление фильма {}", filmWithGeneratedId);
+        return filmWithGeneratedId;
     }
 
 
