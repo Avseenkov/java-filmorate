@@ -25,8 +25,8 @@ public class FilmService {
         return filmStorage.findAll();
     }
 
-    public Film delete(Film film) {
-        return filmStorage.delete(film);
+    public Film delete(int id) {
+        return filmStorage.delete(id);
     }
 
     public Film update(Film film) {
@@ -34,15 +34,15 @@ public class FilmService {
     }
 
     public void setLike(Integer filmId, Integer userId) {
-        Film film = filmStorage.getFilm(filmId);
-        User user = userStorage.getUser(userId);
-        film.setLike(user.getId());
+        Film film = filmStorage.get(filmId);
+        User user = userStorage.get(userId);
+        film.setLike(userId);
     }
 
     public void removeLike(Integer filmId, Integer userId) {
-        Film film = filmStorage.getFilm(filmId);
-        User user = userStorage.getUser(userId);
-        film.removeLike(user.getId());
+        Film film = filmStorage.get(filmId);
+        User user = userStorage.get(userId);
+        film.removeLike(userId);
     }
 
     public Collection<Film> getPopularFilms(Integer count) {
@@ -50,6 +50,6 @@ public class FilmService {
     }
 
     public Film getFilm(Integer id) {
-        return filmStorage.getFilm(id);
+        return filmStorage.get(id);
     }
 }

@@ -8,11 +8,11 @@ public interface FilmStorage {
 
     Film add(Film film);
 
-    Film delete(Film film);
+    Film delete(int id);
 
     Film update(Film film);
 
     Collection<Film> findAll();
 
-    Film getFilm(Integer id);
+    Film get(Integer id);
 }

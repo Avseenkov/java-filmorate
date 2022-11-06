@@ -6,14 +6,14 @@ import java.util.Collection;
 
 public interface UserStorage {
 
-    Collection<User> allUsers();
+    Collection<User> getAll();
 
     User add(User user);
 
-    User delete(User user);
+    User delete(int id);
 
     User update(User user);
 
-    User getUser(Integer id);
+    User get(Integer id);
 
 }

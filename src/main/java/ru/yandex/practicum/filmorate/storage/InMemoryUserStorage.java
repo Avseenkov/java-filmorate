@@ -16,7 +16,7 @@ public class InMemoryUserStorage implements UserStorage {
 
 
     @Override
-    public Collection<User> allUsers() {
+    public Collection<User> getAll() {
         return users.values();
     }
 
@@ -31,12 +31,12 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public User delete(User user) {
+    public User delete(int id) {
 
-        if (!users.containsKey(user.getId())) {
-            throw new UserNotFoundException(String.format("Пользователь с id %s не найдет", user.getId()));
+        if (!users.containsKey(id)) {
+            throw new UserNotFoundException(String.format("Пользователь с id %s не найдет", id));
         }
-
+        User user = users.get(id);
         users.remove(user.getId());
         return user;
     }
@@ -57,7 +57,7 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public User getUser(Integer id) {
+    public User get(Integer id) {
         if (!users.containsKey(id)) {
             throw new UserNotFoundException(String.format("Пользователь с id %s не найдет", id));
         }
