@@ -39,6 +39,6 @@ public class User {
     }
 
     public Set<Integer> getFriends() {
-        return new HashSet<>(friends);
+        return Set.copyOf(friends);
     }
 }

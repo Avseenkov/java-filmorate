@@ -41,6 +41,6 @@ public class Film {
     }
 
     public Set<Integer> getLikes() {
-        return new HashSet<>(likes);
+        return Set.copyOf(likes);
     }
 }
