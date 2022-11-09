@@ -1,52 +1,62 @@
 package ru.yandex.practicum.filmorate.controller;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.UserService;
 
 import javax.validation.Valid;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/users")
+@AllArgsConstructor
 public class UserController {
 
-    private final Map<Integer, User> users = new HashMap<>();
-    private int id = 0;
-    private final static Logger log = LoggerFactory.getLogger(UserController.class);
+    private final UserService userService;
 
     @GetMapping
     public Collection<User> allUsers() {
-        return users.values();
+        return userService.findAll();
+    }
+
+    @GetMapping("{id}")
+    public User getUser(@PathVariable Integer id) {
+        return userService.getUser(id);
     }
 
     @PostMapping
     public User create(@RequestBody @Valid User user) {
-        User userForSave;
-        userForSave = user.toBuilder().id(++id).build();
-        if (userForSave.getName() == null || userForSave.getName().isBlank()) {
-            userForSave = userForSave.toBuilder().name(userForSave.getLogin()).build();
-        }
-        users.put(userForSave.getId(), userForSave);
-        log.info("Добавление пользователя {}", userForSave);
-        return userForSave;
+        return userService.create(user);
     }
 
     @PutMapping
     public User update(@RequestBody @Valid User user) {
-        if (!users.containsKey(user.getId())) {
-            log.info("Пользователь не найдет {}", user);
-            throw new RuntimeException(String.format("Пользователь с id %s не найдет", user.getId()));
-        }
-        User userForSave = user;
-        if (user.getName().isBlank()) {
-            userForSave = user.toBuilder().name(user.getLogin()).build();
-        }
-        users.put(userForSave.getId(), userForSave);
-        log.info("Обновление пользователя {}", userForSave);
-        return user;
+        return userService.update(user);
+    }
+
+    @DeleteMapping("{id}")
+    public User delete(@PathVariable Integer id) {
+        return userService.delete(id);
+    }
+
+    @PutMapping("{id}/friends/{friendId}")
+    public void addFriend(@PathVariable Integer id, @PathVariable Integer friendId) {
+        userService.addFriend(id, friendId);
+    }
+
+    @DeleteMapping("{id}/friends/{friendId}")
+    public void deleteFriend(@PathVariable Integer id, @PathVariable Integer friendId) {
+        userService.removeFriend(id, friendId);
+    }
+
+    @GetMapping("{id}/friends")
+    public Collection<User> getFriends(@PathVariable Integer id) {
+        return userService.getFriends(id);
+    }
+
+    @GetMapping("{id}/friends/common/{otherId}")
+    public Collection<User> getCommonFriends(@PathVariable Integer id, @PathVariable Integer otherId) {
+        return userService.getCommonFriends(id, otherId);
     }
 }
