@@ -1,0 +1,26 @@
+DELETE FROM USERS;
+DELETE FROM FILMS;
+DELETE FROM LIKES;
+DELETE FROM FILM_GENRE;
+DELETE FROM FRIENDS;
+DELETE FROM MPA;
+DELETE FROM GENRES;
+
+ALTER TABLE MPA ALTER COLUMN MPA_ID RESTART WITH 1;
+ALTER TABLE GENRES ALTER COLUMN GENRE_ID RESTART WITH 1;
+
+INSERT INTO MPA(name, description) VALUES ( 'G', 'нет возрастных ограничений' );
+INSERT INTO MPA(NAME, DESCRIPTION) VALUES ( 'PG', 'детям рекомендуется смотреть фильм с родителями' );
+INSERT INTO MPA(NAME, DESCRIPTION) VALUES ( 'PG-13', 'детям до 13 лет просмотр не желателен' );
+INSERT INTO MPA(NAME, DESCRIPTION) VALUES ( 'R', ' лицам до 17 лет просматривать фильм можно только в присутствии взрослого' );
+INSERT INTO MPA(NAME, DESCRIPTION) VALUES ( 'NC-17', 'лицам до 18 лет просмотр запрещён' );
+
+INSERT INTO GENRES(NAME) VALUES ( 'Комедия' );
+INSERT INTO GENRES(NAME) VALUES ( 'Драма' );
+INSERT INTO GENRES(NAME) VALUES ( 'Мультфильм' );
+INSERT INTO GENRES(NAME) VALUES ( 'Триллер' );
+INSERT INTO GENRES(NAME) VALUES ( 'Документальный' );
+INSERT INTO GENRES(NAME) VALUES ( 'Боевик' );
+
+
+

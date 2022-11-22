@@ -30,14 +30,6 @@ public class User {
 
     final Set<Integer> friends = new HashSet<>();
 
-    public void addFriend(Integer id) {
-        friends.add(id);
-    }
-
-    public void removeFriend(Integer id) {
-        friends.remove(id);
-    }
-
     public Set<Integer> getFriends() {
         return Set.copyOf(friends);
     }

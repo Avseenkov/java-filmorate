@@ -1,23 +1,24 @@
 package ru.yandex.practicum.filmorate.service;
 
-import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.FilmStorage;
-import ru.yandex.practicum.filmorate.storage.UserStorage;
+import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.friends.FriendsStorage;
+import ru.yandex.practicum.filmorate.storage.like.LikeStorage;
+import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
-@AllArgsConstructor
 public class UserService {
 
+    @Qualifier("userDbStorage")
     private final UserStorage userStorage;
     private final FilmStorage filmStorage;
+    private final FriendsStorage friendsStorage;
+    private final LikeStorage likeStorage;
 
     public User create(User user) {
         return userStorage.add(user);
@@ -27,9 +28,21 @@ public class UserService {
         return userStorage.getAll();
     }
 
-    public User delete(int id) {
+    public UserService(
+            @Qualifier("userDbStorage") UserStorage userStorage,
+            @Qualifier("filmDbStorage") FilmStorage filmStorage,
+            FriendsStorage friendsStorage,
+            LikeStorage likeStorage
+    ) {
+        this.userStorage = userStorage;
+        this.filmStorage = filmStorage;
+        this.friendsStorage = friendsStorage;
+        this.likeStorage = likeStorage;
+    }
+
+    public boolean delete(int id) {
         for (Film film : filmStorage.findAll()) {
-            film.removeLike(id);
+            likeStorage.removeLike(film.getId(), id);
         }
         return userStorage.delete(id);
     }
@@ -41,29 +54,23 @@ public class UserService {
     public void addFriend(Integer userId, Integer friendId) {
         User user = userStorage.get(userId);
         User friend = userStorage.get(friendId);
-        friend.addFriend(userId);
-        user.addFriend(friendId);
+        friendsStorage.addFriend(userId, friendId);
 
     }
 
     public void removeFriend(Integer userId, Integer friendId) {
         User user = userStorage.get(userId);
         User friend = userStorage.get(friendId);
-        friend.removeFriend(userId);
-        user.removeFriend(friendId);
+        friendsStorage.removeFriend(userId, friendId);
+
     }
 
     public Collection<User> getFriends(Integer userId) {
-        User user = userStorage.get(userId);
-        return user.getFriends().stream().map(userStorage::get).collect(Collectors.toList());
+        return friendsStorage.getFriends(userId);
     }
 
     public Collection<User> getCommonFriends(Integer userId, Integer friendId) {
-        User user = userStorage.get(userId);
-        User friend = userStorage.get(friendId);
-        Set<Integer> friends = new HashSet<>(user.getFriends());
-        friends.retainAll(friend.getFriends());
-        return friends.stream().map(userStorage::get).collect(Collectors.toList());
+        return friendsStorage.getCommonFriends(userId, friendId);
     }
 
     public User getUser(Integer id) {

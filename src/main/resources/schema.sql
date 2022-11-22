@@ -1,4 +1,4 @@
-create table GENRES
+create table IF NOT EXISTS GENRES
 (
     GENRE_ID INTEGER auto_increment,
     NAME     CHARACTER VARYING(20) not null,
@@ -6,7 +6,7 @@ create table GENRES
         primary key (GENRE_ID)
 );
 
-create table MPA
+create table IF NOT EXISTS MPA
 (
     MPA_ID      INTEGER auto_increment,
     NAME        CHARACTER VARYING(10)  not null,
@@ -15,7 +15,7 @@ create table MPA
         primary key (MPA_ID)
 );
 
-create table FILMS
+create table IF NOT EXISTS FILMS
 (
     FILM_ID      INTEGER auto_increment,
     NAME         CHARACTER VARYING(200) not null,
@@ -29,7 +29,9 @@ create table FILMS
         foreign key (MPA_ID) references MPA
 );
 
-create table FILM_GENRE
+ALTER TABLE FILMS ALTER COLUMN FILM_ID RESTART WITH 1;
+
+create table IF NOT EXISTS FILM_GENRE
 (
     FILM_ID  INTEGER not null,
     GENRE_ID INTEGER not null,
@@ -42,7 +44,7 @@ create table FILM_GENRE
         foreign key (GENRE_ID) references GENRES
 );
 
-create table USERS
+create table IF NOT EXISTS USERS
 (
     USER_ID  INTEGER auto_increment,
     EMAIL    CHARACTER VARYING(255) not null,
@@ -53,7 +55,9 @@ create table USERS
         primary key (USER_ID)
 );
 
-create table FRIENDS
+ALTER TABLE USERS ALTER COLUMN USER_ID RESTART WITH 1;
+
+create table IF NOT EXISTS FRIENDS
 (
     USER_ID      INTEGER not null,
     FRIEND_ID    INTEGER not null,
@@ -68,13 +72,13 @@ create table FRIENDS
             on delete cascade
 );
 
-create index "FRIENDS_FRIEND_ID_index"
+create index IF NOT EXISTS "FRIENDS_FRIEND_ID_index"
     on FRIENDS (FRIEND_ID);
 
-create index "FRIENDS_user_id_index"
+create index IF NOT EXISTS "FRIENDS_user_id_index"
     on FRIENDS (USER_ID);
 
-create table LIKES
+create table IF NOT EXISTS LIKES
 (
     FILM_ID INTEGER not null,
     USER_ID INTEGER not null,

@@ -16,7 +16,13 @@ class FilmTestValidation {
 
     @BeforeEach
     void setUp() {
-        film = new Film(1, "Терминатор", "Что-то там с роботами", LocalDate.of(1994, 1, 1), 94);
+        film = Film.builder().id(1)
+                .name("Терминатор")
+                .description("Что-то там с роботами")
+                .releaseDate(LocalDate.of(1994, 1, 1))
+                .duration(94)
+                .mpa(MPA.builder().id(1).name("G").description("нет возрастных ограничений").build())
+                .build();
     }
 
     @Test
