@@ -13,7 +13,8 @@ import ru.yandex.practicum.filmorate.model.User;
 import java.time.LocalDate;
 import java.util.Collection;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest
 @AutoConfigureTestDatabase
@@ -70,7 +71,7 @@ class UserDbStorageTest {
     @Test
     void delete() {
         User userDb = userDbStorage.add(user);
-        assertTrue(userDbStorage.delete(userDb.getId()), "Не удалось удалить фильм");
+        userDbStorage.delete(userDb.getId());
         assertThrows(UserNotFoundException.class, () -> userDbStorage.get(userDb.getId()));
     }
 
