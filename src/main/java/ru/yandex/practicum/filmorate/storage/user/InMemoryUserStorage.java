@@ -33,14 +33,13 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public boolean delete(int id) {
+    public void delete(int id) {
 
         if (!users.containsKey(id)) {
             throw new UserNotFoundException(String.format("Пользователь с id %s не найдет", id));
         }
         User user = users.get(id);
         users.remove(user.getId());
-        return true;
     }
 
     @Override

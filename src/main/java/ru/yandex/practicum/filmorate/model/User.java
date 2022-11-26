@@ -7,6 +7,7 @@ import lombok.Getter;
 import javax.validation.constraints.*;
 import java.time.LocalDate;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 @Data
@@ -32,5 +33,9 @@ public class User {
 
     public Set<Integer> getFriends() {
         return Set.copyOf(friends);
+    }
+
+    public Optional<LocalDate> getBirthday() {
+        return Optional.of(birthday);
     }
 }

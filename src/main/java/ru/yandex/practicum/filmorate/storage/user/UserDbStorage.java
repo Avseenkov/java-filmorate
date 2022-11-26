@@ -12,9 +12,10 @@ import ru.yandex.practicum.filmorate.storage.utils.MakeObjectFromResultSet;
 
 import java.sql.Date;
 import java.sql.PreparedStatement;
+import java.time.LocalDate;
 import java.util.Collection;
 
-@Component()
+@Component
 @AllArgsConstructor
 @Qualifier("userDbStorage")
 public class UserDbStorage implements UserStorage {
@@ -44,7 +45,7 @@ public class UserDbStorage implements UserStorage {
                     ps.setString(1, userForSave.getEmail());
                     ps.setString(2, userForSave.getLogin());
                     ps.setString(3, userForSave.getName());
-                    ps.setDate(4, Date.valueOf(userForSave.getBirthday()));
+                    ps.setDate(4, Date.valueOf(userForSave.getBirthday().orElse(LocalDate.MIN)));
                     return ps;
                 }, keyHolder);
 
@@ -53,10 +54,9 @@ public class UserDbStorage implements UserStorage {
     }
 
     @Override
-    public boolean delete(int id) {
-        get(id);
+    public void delete(int id) {
         final String sql = "DELETE FROM USERS WHERE user_id=?";
-        return jdbcTemplate.update(sql, id) != 0;
+        jdbcTemplate.update(sql, id);
     }
 
     @Override
@@ -67,7 +67,12 @@ public class UserDbStorage implements UserStorage {
         }
         get(user.getId());
         final String UPDATE_SQL = "UPDATE USERS SET name=?, login=?, email=?, birthday=? WHERE user_id = ?";
-        jdbcTemplate.update(UPDATE_SQL, userForSave.getName(), userForSave.getLogin(), userForSave.getEmail(), userForSave.getBirthday(), userForSave.getId());
+        jdbcTemplate.update(UPDATE_SQL,
+                userForSave.getName(),
+                userForSave.getLogin(),
+                userForSave.getEmail(),
+                userForSave.getBirthday().orElse(LocalDate.MIN),
+                userForSave.getId());
         return get(userForSave.getId());
     }
 

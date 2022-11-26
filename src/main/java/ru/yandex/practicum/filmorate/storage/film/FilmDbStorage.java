@@ -15,6 +15,7 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -37,8 +38,8 @@ public class FilmDbStorage implements FilmStorage {
             PreparedStatement ps = con.prepareStatement(ADD_SQL, new String[]{"film_id"});
             ps.setString(1, film.getName());
             ps.setString(2, film.getDescription());
-            ps.setDate(3, Date.valueOf(film.getReleaseDate()));
-            ps.setInt(4, film.getDuration());
+            ps.setDate(3, Date.valueOf(film.getReleaseDate().orElse(LocalDate.MIN)));
+            ps.setInt(4, film.getDuration().orElse(0));
             ps.setInt(5, film.getMpa().getId());
             return ps;
         }, keyHolder);
@@ -61,7 +62,14 @@ public class FilmDbStorage implements FilmStorage {
         final String UPDATE_SQL = "UPDATE FILMS SET NAME=? ,DESCRIPTION=?, RELEASE_DATE=?, DURATION=?, MPA_ID=? WHERE FILM_ID=?";
         final String DELETE_GENRE = "DELETE FROM FILM_GENRE WHERE film_id=?";
 
-        jdbcTemplate.update(UPDATE_SQL, film.getName(), film.getDescription(), film.getReleaseDate(), film.getDuration(), film.getMpa().getId(), film.getId());
+        jdbcTemplate.update(UPDATE_SQL,
+                film.getName(),
+                film.getDescription(),
+                film.getReleaseDate().orElse(LocalDate.MIN),
+                film.getDuration().orElse(0),
+                film.getMpa().getId(),
+                film.getId()
+        );
         jdbcTemplate.update(DELETE_GENRE, film.getId());
         updateGenres(film, film.getId());
         return get(film.getId());

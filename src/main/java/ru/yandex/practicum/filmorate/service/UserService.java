@@ -40,11 +40,11 @@ public class UserService {
         this.likeStorage = likeStorage;
     }
 
-    public boolean delete(int id) {
+    public void delete(int id) {
         for (Film film : filmStorage.findAll()) {
             likeStorage.removeLike(film.getId(), id);
         }
-        return userStorage.delete(id);
+        userStorage.delete(id);
     }
 
     public User update(User user) {

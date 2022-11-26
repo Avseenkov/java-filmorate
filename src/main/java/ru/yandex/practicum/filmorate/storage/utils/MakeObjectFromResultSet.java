@@ -36,4 +36,11 @@ public class MakeObjectFromResultSet {
     public static Genre makeGenre(ResultSet rs, int rowNum) throws SQLException {
         return Genre.builder().id(rs.getInt("genre_id")).name(rs.getString("name")).build();
     }
+    public static MPA makeMPA(ResultSet rs, int rowNum) throws SQLException {
+        return MPA.builder()
+                .id(rs.getInt("mpa_id"))
+                .name(rs.getString("name"))
+                .description(rs.getString("description"))
+                .build();
+    }
 }

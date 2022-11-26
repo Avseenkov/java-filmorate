@@ -1,6 +1,6 @@
 create table IF NOT EXISTS GENRES
 (
-    GENRE_ID INTEGER auto_increment,
+    GENRE_ID INTEGER not null auto_increment,
     NAME     CHARACTER VARYING(20) not null,
     constraint GENRES_PK
         primary key (GENRE_ID)
@@ -8,7 +8,7 @@ create table IF NOT EXISTS GENRES
 
 create table IF NOT EXISTS MPA
 (
-    MPA_ID      INTEGER auto_increment,
+    MPA_ID      INTEGER not null auto_increment,
     NAME        CHARACTER VARYING(10)  not null,
     DESCRIPTION CHARACTER VARYING(100) not null,
     constraint "MPA_pk"
@@ -17,7 +17,7 @@ create table IF NOT EXISTS MPA
 
 create table IF NOT EXISTS FILMS
 (
-    FILM_ID      INTEGER auto_increment,
+    FILM_ID      INTEGER not null auto_increment,
     NAME         CHARACTER VARYING(200) not null,
     DESCRIPTION  CHARACTER LARGE OBJECT,
     RELEASE_DATE DATE,
@@ -29,7 +29,7 @@ create table IF NOT EXISTS FILMS
         foreign key (MPA_ID) references MPA
 );
 
-ALTER TABLE FILMS ALTER COLUMN FILM_ID RESTART WITH 1;
+//ALTER TABLE FILMS ALTER COLUMN FILM_ID RESTART WITH 1;
 
 create table IF NOT EXISTS FILM_GENRE
 (
@@ -46,7 +46,7 @@ create table IF NOT EXISTS FILM_GENRE
 
 create table IF NOT EXISTS USERS
 (
-    USER_ID  INTEGER auto_increment,
+    USER_ID  INTEGER not null auto_increment,
     EMAIL    CHARACTER VARYING(255) not null,
     LOGIN    CHARACTER VARYING(255) not null,
     NAME     CHARACTER VARYING(255) not null,
@@ -55,13 +55,13 @@ create table IF NOT EXISTS USERS
         primary key (USER_ID)
 );
 
-ALTER TABLE USERS ALTER COLUMN USER_ID RESTART WITH 1;
+//ALTER TABLE USERS ALTER COLUMN USER_ID RESTART WITH 1;
 
 create table IF NOT EXISTS FRIENDS
 (
     USER_ID      INTEGER not null,
     FRIEND_ID    INTEGER not null,
-    IS_CONFIRMED BOOLEAN default FALSE,
+    IS_CONFIRMED BOOLEAN default FALSE not null,
     constraint "FRIENDS_pk"
         primary key (USER_ID, FRIEND_ID),
     constraint "FRIENDS_USERS_friend_fk"

@@ -10,6 +10,7 @@ import javax.validation.constraints.Positive;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 @Data
@@ -51,5 +52,13 @@ public class Film {
 
     public Set<Integer> getLikes() {
         return Set.copyOf(likes);
+    }
+
+    public Optional<Integer> getDuration() {
+        return Optional.of(duration);
+    }
+
+    public Optional<LocalDate> getReleaseDate() {
+        return Optional.of(releaseDate);
     }
 }
