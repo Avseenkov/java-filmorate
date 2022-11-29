@@ -73,7 +73,7 @@ public class UserDbStorage implements UserStorage {
                 userForSave.getEmail(),
                 userForSave.getBirthday().orElse(LocalDate.MIN),
                 userForSave.getId());
-        return get(userForSave.getId());
+        return user;
     }
 
     @Override

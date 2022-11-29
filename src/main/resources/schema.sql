@@ -29,8 +29,6 @@ create table IF NOT EXISTS FILMS
         foreign key (MPA_ID) references MPA
 );
 
-//ALTER TABLE FILMS ALTER COLUMN FILM_ID RESTART WITH 1;
-
 create table IF NOT EXISTS FILM_GENRE
 (
     FILM_ID  INTEGER not null,
@@ -55,13 +53,11 @@ create table IF NOT EXISTS USERS
         primary key (USER_ID)
 );
 
-//ALTER TABLE USERS ALTER COLUMN USER_ID RESTART WITH 1;
-
 create table IF NOT EXISTS FRIENDS
 (
     USER_ID      INTEGER not null,
     FRIEND_ID    INTEGER not null,
-    IS_CONFIRMED BOOLEAN default FALSE not null,
+    IS_CONFIRMED BOOLEAN default TRUE not null,
     constraint "FRIENDS_pk"
         primary key (USER_ID, FRIEND_ID),
     constraint "FRIENDS_USERS_friend_fk"

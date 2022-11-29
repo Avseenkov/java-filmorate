@@ -13,15 +13,10 @@ import ru.yandex.practicum.filmorate.storage.utils.MakeObjectFromResultSet;
 
 import java.sql.Date;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 @Component
 @AllArgsConstructor
@@ -51,7 +46,6 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public boolean delete(int id) {
-        get(id);
         final String DELETE_SQL = "DELETE FROM FILMS WHERE FILM_ID=?";
         return jdbcTemplate.update(DELETE_SQL, id) != 0;
     }
@@ -77,68 +71,46 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public Collection<Film> findAll() {
-        final String FIND_ALL_SQL = "SELECT f.film_id, f.name, f.description, f.release_date, f.duration, f.mpa_id, m.mpa_id , m.name as nameMPA, m.description AS descriptionMPA  FROM FILMS f LEFT JOIN MPA m ON f.mpa_id= m.MPA_ID";
-        final String LIKES_FOR_FILMS = "SELECT f.film_id as film_id, l.user_id as user_id FROM FILMS f INNER JOIN LIKES l ON f.film_id = l.film_id ";
-        final String GENRE_FOR_FILMS = "SELECT f.film_id ,fg.genre_id as genre_id, g.name " +
+        final String FIND_ALL_SQL = "SELECT f.film_id, MAX(f.name) as name, MAX(f.description) as description, MAX(f.release_date) as release_date, MAX(f.duration) as duration, " +
+                "MAX(m.mpa_id) as mpa_id, MAX(m.name) AS nameMPA, MAX(m.description) AS descriptionMPA, " +
+                "ARRAY_AGG (l.user_id ORDER BY l.user_id) FILTER (WHERE l.user_id IS NOT NULL) as user_id, " +
+                "ARRAY_AGG(fg.genre_id ORDER BY fg.genre_id) FILTER (WHERE fg.genre_id IS NOT NULL)  as genre_id ," +
+                "ARRAY_AGG(g.name ORDER BY fg.genre_id) FILTER (WHERE g.name IS NOT NULL) as genre_name " +
                 "FROM FILMS f " +
-                "INNER JOIN FILM_GENRE fg ON fg.film_id = f.film_id " +
-                "LEFT JOIN GENRES g ON fg.genre_id = g.genre_id ";
+                "LEFT JOIN MPA m ON f.mpa_id= m.MPA_ID " +
+                "LEFT JOIN LIKES l ON f.film_id = l.film_id " +
+                "LEFT JOIN FILM_GENRE fg ON fg.film_id = f.film_id " +
+                "LEFT JOIN GENRES g ON fg.genre_id = g.genre_id " +
+                "GROUP BY f.film_id";
+        ;
 
-        Collection<Film> films = jdbcTemplate.query(FIND_ALL_SQL, MakeObjectFromResultSet::makeFilm);
-        jdbcTemplate.query(
-                LIKES_FOR_FILMS,
-                (rs, rowNum) -> addLikeToFilm((films.stream().collect(Collectors.toMap(Film::getId, Function.identity()))), rs)
-        );
+        return jdbcTemplate.query(FIND_ALL_SQL, MakeObjectFromResultSet::makeFilm);
 
-        jdbcTemplate.query(GENRE_FOR_FILMS,
-                (rs, rowNum) -> addGenreToFilm((films.stream().collect(Collectors.toMap(Film::getId, Function.identity()))), rs, rowNum)
-        );
-        return films;
     }
 
     @Override
     public Film get(Integer id) {
-        final String GET_FILM_SQL = "SELECT f.film_id, f.name, f.description, f.release_date, f.duration, m.mpa_id, m.mpa_id, m.name AS nameMPA, m.description AS descriptionMPA" +
-                " FROM FILMS f LEFT JOIN MPA m ON f.mpa_id= m.MPA_ID WHERE FILM_ID=?";
-        final String LIKES_FOR_FILM = "SELECT f.film_id , l.user_id as user_id " +
+        final String GET_FILM_SQL = "SELECT f.film_id, MAX(f.name) as name, MAX(f.description) as description, MAX(f.release_date) as release_date, MAX(f.duration) as duration, " +
+                "MAX(m.mpa_id) as mpa_id, MAX(m.name) AS nameMPA, MAX(m.description) AS descriptionMPA, " +
+                "ARRAY_AGG(l.user_id ORDER BY l.user_id) FILTER (WHERE l.user_id IS NOT NULL) as user_id, " +
+                "ARRAY_AGG(fg.genre_id ORDER BY fg.genre_id) FILTER (WHERE fg.genre_id IS NOT NULL)  as genre_id ," +
+                "ARRAY_AGG(g.name ORDER BY fg.genre_id) FILTER (WHERE g.name IS NOT NULL) as genre_name " +
                 "FROM FILMS f " +
-                "INNER JOIN LIKES l ON f.film_id = l.film_id " +
-                "WHERE f.film_id=?";
-        final String GET_GENRES_SQL = "SELECT f.film_id ,fg.genre_id as genre_id, g.name " +
-                "FROM FILMS f " +
-                "INNER JOIN FILM_GENRE fg ON fg.film_id = f.film_id " +
+                "LEFT JOIN MPA m ON f.mpa_id= m.MPA_ID " +
+                "LEFT JOIN LIKES l ON f.film_id = l.film_id " +
+                "LEFT JOIN FILM_GENRE fg ON fg.film_id = f.film_id " +
                 "LEFT JOIN GENRES g ON fg.genre_id = g.genre_id " +
-                "WHERE f.film_id=? ORDER BY g.genre_id";
-        Film film;
+                "WHERE f.FILM_ID = ? " +
+                "GROUP BY f.film_id";
+        return getFilmFromDb(id, GET_FILM_SQL);
+    }
+
+    private Film getFilmFromDb(Integer id, String GET_FILM_SQL) {
         try {
-            film = jdbcTemplate.queryForObject(GET_FILM_SQL, MakeObjectFromResultSet::makeFilm, id);
+            return jdbcTemplate.queryForObject(GET_FILM_SQL, MakeObjectFromResultSet::makeFilm, id);
         } catch (RuntimeException e) {
             throw new FilmNotFoundException(String.format("Фильм с id %s не найден", id));
         }
-        jdbcTemplate.query(LIKES_FOR_FILM, (rs, rowNum) -> {
-            film.setLike(rs.getInt("user_id"));
-            return film;
-        }, id);
-
-        jdbcTemplate.query(GET_GENRES_SQL, (rs, rowNum) -> {
-            film.setGenre(MakeObjectFromResultSet.makeGenre(rs, rowNum));
-            return film;
-        }, id);
-
-        return film;
-    }
-
-
-    private boolean addLikeToFilm(Map<Integer, Film> films, ResultSet rs) throws SQLException {
-        Film film = films.get(rs.getInt("film_id"));
-        film.setLike(rs.getInt("user_id"));
-        return true;
-    }
-
-    private boolean addGenreToFilm(Map<Integer, Film> films, ResultSet rs, int rowNum) throws SQLException {
-        Film film = films.get(rs.getInt("film_id"));
-        film.setGenre(MakeObjectFromResultSet.makeGenre(rs, rowNum));
-        return true;
     }
 
     private void updateGenres(Film film, int id) {
