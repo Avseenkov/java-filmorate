@@ -10,6 +10,7 @@ import javax.validation.constraints.Positive;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 @Data
@@ -30,10 +31,19 @@ public class Film {
     @Positive(message = "продолжительность фильма должна быть положительной")
     final int duration;
 
+    @NotNull
+    final MPA mpa;
+
     final Set<Integer> likes = new HashSet<>();
+
+    final Set<Genre> genres = new HashSet<>();
 
     public void setLike(Integer id) {
         likes.add(id);
+    }
+
+    public void setGenre(Genre genre) {
+        genres.add(genre);
     }
 
     public void removeLike(Integer id) {
@@ -43,4 +53,13 @@ public class Film {
     public Set<Integer> getLikes() {
         return Set.copyOf(likes);
     }
+
+    public Optional<Integer> getDuration() {
+        return Optional.of(duration);
+    }
+
+    public Optional<LocalDate> getReleaseDate() {
+        return Optional.of(releaseDate);
+    }
+
 }

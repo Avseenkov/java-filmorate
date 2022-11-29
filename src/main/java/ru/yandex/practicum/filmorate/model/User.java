@@ -7,6 +7,7 @@ import lombok.Getter;
 import javax.validation.constraints.*;
 import java.time.LocalDate;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 @Data
@@ -30,15 +31,11 @@ public class User {
 
     final Set<Integer> friends = new HashSet<>();
 
-    public void addFriend(Integer id) {
-        friends.add(id);
-    }
-
-    public void removeFriend(Integer id) {
-        friends.remove(id);
-    }
-
     public Set<Integer> getFriends() {
         return Set.copyOf(friends);
+    }
+
+    public Optional<LocalDate> getBirthday() {
+        return Optional.of(birthday);
     }
 }
